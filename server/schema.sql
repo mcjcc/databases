@@ -3,10 +3,10 @@ CREATE DATABASE chat;
 USE chat;
 /* Create other tables and define schemas for them here! */
 CREATE TABLE users (
-id INT NOT NULL,
-username VARCHAR(20) NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT UNIQUE,
+  username VARCHAR(20) NOT NULL UNIQUE,
 
-PRIMARY KEY (id)
+  PRIMARY KEY (id)
 
 );
 
@@ -14,7 +14,7 @@ CREATE TABLE messages (
   /* Describe your table here.*/
   -- column_name column_data_type [additonal info] ,
   -- PRIMARY KEY (<column_name>)
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT UNIQUE,
   message_text TEXT NOT NULL,
   room_name VARCHAR(20) NOT NULL DEFAULT 'Lobby',
   users_id  INT,

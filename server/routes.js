@@ -12,6 +12,9 @@ router.post('/users', controller.users.post);
 
 router.get('/', controller.home.get);
 
+// www.url.com/messages
+
+
 
 module.exports = router;
 
