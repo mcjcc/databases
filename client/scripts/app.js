@@ -1,9 +1,8 @@
-
 var app = {
 
   //TODO: The current 'handleUsernameClick' function just toggles the class 'friend'
   //to all messages sent by the user
-  server: 'http://parse.CAMPUS.hackreactor.com/chatterbox/classes/messages',
+  server: 'http://127.0.0.1:3000/classes/messages',
   username: 'anonymous',
   roomname: 'lobby',
   lastMessageId: 0,
@@ -36,6 +35,7 @@ var app = {
   },
 
   send: function(message) {
+    console.log(app.server);
     app.startSpinner();
 
     // POST the message to the server
@@ -56,32 +56,34 @@ var app = {
     });
   },
 
-  fetch: function(animate) {
+  fetch: function(animate) { 
+    console.log('client fetching! ', app.server);    
     $.ajax({
       url: app.server,
       type: 'GET',
       data: { order: '-createdAt' },
       contentType: 'application/json',
       success: function(data) {
+        console.log(data);
         // Don't bother if we have nothing to work with
-        if (!data.results || !data.results.length) { return; }
-
+        if (!data || !data.length) { return; }
+    
         // Store messages for caching later
-        app.messages = data.results;
+        app.messages = data;
 
         // Get the last message
-        var mostRecentMessage = data.results[data.results.length - 1];
+        var mostRecentMessage = data[data.length - 1];
 
         // Only bother updating the DOM if we have a new message
-        if (mostRecentMessage.objectId !== app.lastMessageId) {
+        if (mostRecentMessage.id !== app.lastMessageId) {
           // Update the UI with the fetched rooms
-          app.renderRoomList(data.results);
+          app.renderRoomList(data);
 
           // Update the UI with the fetched messages
-          app.renderMessages(data.results, animate);
+          app.renderMessages(data, animate);
 
           // Store the ID of the most recent message
-          app.lastMessageId = mostRecentMessage.objectId;
+          app.lastMessageId = mostRecentMessage.id;
         }
       },
       error: function(error) {
@@ -102,8 +104,8 @@ var app = {
       // Add all fetched messages that are in our current room
       messages
         .filter(function(message) {
-          return message.roomname === app.roomname ||
-                 app.roomname === 'lobby' && !message.roomname;
+          return message.room_name === app.roomname ||
+                 app.roomname === 'lobby' && !message.room_name;
         })
         .forEach(app.renderMessage);
     }
@@ -120,7 +122,7 @@ var app = {
     if (messages) {
       var rooms = {};
       messages.forEach(function(message) {
-        var roomname = message.roomname;
+        var roomname = message.room_name;
         if (roomname && !rooms[roomname]) {
           // Add the room to the select menu
           app.renderRoom(roomname);
@@ -144,8 +146,8 @@ var app = {
   },
 
   renderMessage: function(message) {
-    if (!message.roomname) {
-      message.roomname = 'lobby';
+    if (!message.room_name) {
+      message.room_name = 'lobby';
     }
 
     // Create a div to hold the chats
@@ -154,15 +156,15 @@ var app = {
     // Add in the message data using DOM methods to avoid XSS
     // Store the username in the element's data attribute
     var $username = $('<span class="username"/>');
-    $username.text(message.username + ': ').attr('data-roomname', message.roomname).attr('data-username', message.username).appendTo($chat);
+    $username.text(message.user_name + ': ').attr('data-roomname', message.room_name).attr('data-username', message.user_name).appendTo($chat);
 
     // Add the friend class
-    if (app.friends[message.username] === true) {
+    if (app.friends[message.user_name] === true) {
       $username.addClass('friend');
     }
 
     var $message = $('<br><span/>');
-    $message.text(message.text).appendTo($chat);
+    $message.text(message.message_text).appendTo($chat);
 
     // Add the message to the UI
     app.$chats.append($chat);
