@@ -10,6 +10,13 @@ module.exports = {
     // Ditto as above
     get: function (req, res) {},
     post: function (req, res) {}
+  }, 
+
+  home: {
+    get: function(req, res) {
+      // res.send('hello');
+    }
   }
 };
 
+// requests and responses to the server
